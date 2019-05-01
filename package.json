@@ -1,0 +1,16 @@
+{
+  "name": "escape-room-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "redirect.js",
+  "dependencies": {
+    "socket.io": "^2.2.0",
+    "socketio": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      font-size: 18px;
+    }
+
+    button {
+      -webkit-appearance: none;
+      -moz-appearance:    none;
+      appearance:         none;
+      color: white;
+      border: none;
+      background-color: #25ab35;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: inherit;
+    }
+
+    button:hover {
+      background-color: #30ba40;
+    }
+
+    button:active {
+      background-color: #0b7218;
+    }
+
+    .buttons {
+      padding-bottom: 100px;
+    }
+  </style>
+</head>
+<body>
+  <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
+  <script>
+    const buildQueryString = (params) => Object.keys(params).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')
+    window.onload = () => {
+      let socket = io({
+        query: buildQueryString({ url: window.location.href }),
+      })
+
+      document.querySelectorAll('button').forEach((element) => {
+        element.addEventListener('click', (event) => {
+          socket.emit(element.id)
+        })
+      })
+    }
+  </script>
+  <div class="buttons">
+    <h2>Computer control</h2>
+    <button id="activate-part1">PART ONE</button>
+    <button id="activate-part2">PART TWO</button>
+    <h2>Video control</h2>
+    <button id="activate-video-play">PLAY VIDEO</button>
+    <button id="activate-video-pause">PAUSE VIDEO</button>
+    <button id="activate-video-reset">RESET VIDEO</button>
+  </div>
+</body>
+</html>
