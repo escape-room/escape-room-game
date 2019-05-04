@@ -21,23 +21,28 @@
       appearance:         none;
       color: white;
       border: none;
-      background-color: #25ab35;
+      background-color: #ff8106;
       padding: 10px 20px;
       border-radius: 5px;
       cursor: pointer;
       font-size: inherit;
+      margin-right: 10px;
     }
 
     button:hover {
-      background-color: #30ba40;
+      background-color: #ff2906;
     }
 
     button:active {
-      background-color: #0b7218;
+      background-color: #b01900;
     }
 
     .buttons {
       padding-bottom: 100px;
+    }
+
+    .button-group {
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -46,25 +51,41 @@
   <script>
     const buildQueryString = (params) => Object.keys(params).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')
     window.onload = () => {
-      let socket = io({
+      const lastPressed = document.getElementById('last-pressed')
+      const socket = io({
         query: buildQueryString({ url: window.location.href }),
       })
 
       document.querySelectorAll('button').forEach((element) => {
         element.addEventListener('click', (event) => {
           socket.emit(element.id)
+          lastPressed.innerHTML = element.innerHTML
         })
       })
     }
   </script>
   <div class="buttons">
+    <h2>Last activated:</h2>
+    <div id="last-pressed">NONE</div>
+
     <h2>Computer control</h2>
-    <button id="activate-part1">PART ONE</button>
-    <button id="activate-part2">PART TWO</button>
+    <button id="computer--part-1">PART 1</button>
+    <button id="computer--part-2">PART 2</button>
+
     <h2>Video control</h2>
-    <button id="activate-video-play">PLAY VIDEO</button>
-    <button id="activate-video-pause">PAUSE VIDEO</button>
-    <button id="activate-video-reset">RESET VIDEO</button>
+    <div class="button-group">
+      <button id="play--v1-boarding">1: PROMPT BOARDING</button>
+      <button id="play--v2-push-button">2: PROMPT BUTTON</button>
+    </div>
+
+    <div class="button-group">
+      <button id="play--v3-to-the-past">3A: TO THE PAST</button>
+      <button id="play--v3-return">3B: RETURN TO PRESENT</button>
+    </div>
+
+    <div class="button-group">
+      <button id="pause--all">4: PAUSE ALL</button>
+    </div>
   </div>
 </body>
 </html>

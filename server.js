@@ -13,7 +13,7 @@ const server = http.createServer((request, response) => {
     
     switch(filePath) {
       case './': 
-        filePath = './part1.html'
+        filePath = './controller.html'
         break
     }
 
@@ -59,30 +59,21 @@ io.on('connection', (socket) => {
     callback(data)
   })
 
-  const emit = (name, callback) => {
+  const broadcast = (name, callback) => {
     console.log("EMITTING: <" + name + ">")
     socket.broadcast.emit(name)
   }
 
-  on('activate-part1', () => {
-    emit('client-to-part1')
-  })
+  const bindRelay = (name) => {
+    on(name, () => {
+      broadcast(name)
+    })
+  }
 
-  on('activate-part2', () => {
-    emit('client-to-part2')
-  })
-
-  on('activate-video-play', () => {
-    emit('video-to-play')
-  })
-
-  on('activate-video-pause', () => {
-    emit('video-to-pause')
-  })
-
-  on('activate-video-reset', () => {
-    emit('video-to-reset')
-  })
+  // should really just be accepting one event and just doing message passing
+  const events = ["computer--part-1", "computer--part-2", "play--v1-boarding",
+                  "play--v2-push-button", "play--v3-to-the-past", "play--v3-return", "pause--all"]
+  events.map(event => bindRelay(event))
 })
 
 server.listen(PORT)

@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background-color: black;
+    }
     video {
       width: 100vw;
     }
@@ -11,41 +16,74 @@
   <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
   <script>
     const buildQueryString = (params) => Object.keys(params).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')
-    window.onload = () => {
-      const video = document.getElementById("video")
 
+    function resetVideos(videos) {
+      videos.map(video => {
+        video.style.display = "none"
+        video.pause()
+        video.currentTime = 0
+      })
+    }
+
+    function playSounds() {
+      showAndPlay(document.getElementById('v4-sounds'))
+    }
+
+    async function showAndPlay(video) {
+      try {
+        console.log("ATTEMPT TO PLAY: " + video.src)
+        video.style.display = "block"
+        await video.play()
+      } catch(err) {
+        console.error(err)
+        setTimeout(showAndPlay, 1000)
+      }
+    }
+
+    window.onload = () => {
       let socket = io({
         query: buildQueryString({ url: window.location.href }),
       })
 
+      const videos = Array.from(document.querySelectorAll("video"))
+
       const on = (name, callback) => socket.on(name, (data) => {
         console.log("RECIEVED: <" + name + ">")
-        console.log("  | DATA: " + data)
+        if (data) {
+          console.log("  | DATA: " + data)  
+        }
         callback(data)
       })
 
-      const tryToPlay = async () => {
-        try {
-          console.log("ATTEMPT TO PLAY")
-          await video.play()
-        } catch(err) {
-          console.error(err)
-          tryToPlay()
-        }
-      }
+      const playEventNames = ["play--v1-boarding", "play--v2-push-button", "play--v3-to-the-past", "play--v3-return"]
+      playEventNames.map(eventName => {
+        const videoId = eventName.split('--')[1]
 
-      on('video-to-play', tryToPlay)
-      on('video-to-pause', () => video.pause())
-      on('video-to-reset', () => {
-        video.currentTime = 0
-        video.pause()
+        on(eventName, (data) => {
+          resetVideos(videos)
+          showAndPlay(document.getElementById(videoId))
+        })
+      })
+
+      Array.from(document.querySelectorAll('#v3-to-the-past, #v3-return')).map(video => {
+        video.addEventListener('ended', (event) => {
+          playSounds()
+        })
+      })
+
+      on("pause--all", () => {
+        resetVideos(videos)
       })
     }
   </script>
 </head>
 <body>
-  <video id="video">
-    <source src="video.mp4" type="video/mp4">
-  </video>
+  <video id="v1-boarding" src="videos/1-boarding.mp4" type="video/mp4" preload="auto" loop></video>
+  <video id="v2-push-button" src="videos/2-push-button.mp4" type="video/mp4" preload="auto" loop></video>
+
+  <video id="v3-to-the-past" src="videos/3-to-the-past.mp4" type="video/mp4" preload="auto" onend="playSounds()"></video>
+  <video id="v3-return" src="videos/3-return.mp4" type="video/mp4" preload="auto" onend="playSounds()"></video>
+
+  <video id="v4-sounds" src="videos/4-sounds.mp4" type="video/mp4" preload="auto" height="0" loop></video>
 </body>
 </html>

@@ -13,11 +13,11 @@ const bindRedirectListeners = () => {
     callback(data)
   })
 
-  on('client-to-part2', () => {
+  on('computer--part-2', () => {
     window.location.href = '../part2.html'
   })
 
-  on('client-to-part1', () => {
+  on('computer--part-1', () => {
     window.location.href = '../part1.html'
   })
 }
