@@ -39,9 +39,9 @@ function socketMiddleware(fn) {
       callback(data)
     })
 
-    const broadcast = (name, callback) => {
+    const broadcast = (name, data) => {
       console.log("EMITTING: <" + name + ">")
-      socket.broadcast.emit(name)
+      socket.broadcast.emit(name, data)
     }
 
     if (fn) {
@@ -64,6 +64,7 @@ function parserMiddleware(fn) {
 async function main() {
   const HTTP_PORT = 8181
   const server = http.createServer(HTTP_PORT, (req, res) => {
+    // response.writeHead(200, { 'Content-Type': 'text/html' });
     res.end('HELLO')
   })
   let { serialPort, parser } = await connectSerialPort(9600)
@@ -75,15 +76,19 @@ async function main() {
     })
 
     parser = serialPort.pipe(new Readline())
-    parser.on('data', parserMiddleware(() => {}))
-  })
 
-  io = socketio(server)
-  io.on('connection', socketMiddleware((socket, on, broadcast) => {
-    on('send-serial', (message) => {
-      serialPort.write(message + '\n')
-    })   
-  }))
+    // sad nesting cause no promises
+    io = socketio(server)
+    io.on('connection', socketMiddleware((socket, on, broadcast) => {
+      on('send-serial', (message) => {
+        serialPort.write(message + '\n')
+      })
+
+      parser.on('data', parserMiddleware((data) => {
+        broadcast('receive-serial', data)
+      }))
+    }))
+  })
 
   server.listen(HTTP_PORT)
 }

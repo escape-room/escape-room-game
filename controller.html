@@ -42,6 +42,7 @@
     }
 
     .button-group {
+      max-width: 600px;
       margin-bottom: 10px;
     }
   </style>
@@ -52,21 +53,37 @@
     const buildQueryString = (params) => Object.keys(params).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')
     window.onload = () => {
       const lastPressed = document.getElementById('last-pressed')
+
       const socket = io({
         query: buildQueryString({ url: window.location.href }),
       })
 
+      const serialSocket = io('http://localhost:8181', { forceNew: true })
+
       document.querySelectorAll('button').forEach((element) => {
         element.addEventListener('click', (event) => {
-          socket.emit(element.id)
+          if (element.id.includes('serial')) {
+            serialSocket.emit(element.id, element.dataset.message)
+          }
+          else {
+            socket.emit(element.id)  
+          }
+          
           lastPressed.innerHTML = element.innerHTML
         })
+      })
+
+      serialSocket.on('receive-serial', (data) => {
+        document.getElementById('serial-status').innerHTML = data
       })
     }
   </script>
   <div class="buttons">
     <h2>Last activated:</h2>
     <div id="last-pressed">NONE</div>
+
+    <h2>Serial status:</h2>
+    <div id="serial-status">NONE</div>
 
     <h2>Computer control</h2>
     <button id="computer--part-1">PART 1</button>
@@ -85,6 +102,12 @@
 
     <div class="button-group">
       <button id="pause--all">4: PAUSE ALL</button>
+    </div>
+
+    <h2>Enable button</h2>
+    <div class="button-group">
+      <button id="send-serial" data-message="ENABLE-BUTTON:play--v3-to-the-past">ENABLE TO THE PAST</button>
+      <button id="send-serial" data-message="ENABLE-BUTTON:play--v3-return">ENABLE RETURN TO PRESENT</button>
     </div>
   </div>
 </body>
