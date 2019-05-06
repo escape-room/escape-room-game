@@ -6,13 +6,15 @@ const Readline = Serial.parsers.Readline
   
 async function connectSerialPort(baudRate) {
   const availablePorts = await Serial.list()
-  const arduinoPorts = availablePorts.filter(({ manufacturer }) => manufacturer && manufacturer.includes('Arduino'))
+  const arduinoPorts = availablePorts.filter(({ comName }) => comName.includes('usbserial'))
+  // const arduinoPorts = availablePorts.filter(({ manufacturer }) => manufacturer && manufacturer.includes('Arduino'))
 
   if (arduinoPorts.length == 0) {
     throw new Error('No Arduino found!')
   }
 
   const comPort = arduinoPorts[0].comName
+  // const comPort = '/dev/cu.usbserial-1442410'
   console.log(comPort)
   const serialPort = new Serial(comPort, { baudRate: baudRate })
   const parser = serialPort.pipe(new Ready({ delimiter: 'READY' }))
@@ -71,9 +73,6 @@ async function main() {
 
   parser.on('ready', () => {
     console.log("SERIAL READY")
-    serialPort.write('howdy\n', (err) => { 
-      console.log(err)
-    })
 
     parser = serialPort.pipe(new Readline())
 

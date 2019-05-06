@@ -3,12 +3,21 @@ void setup() {
   Serial.println("READY");
 }
 
-void loop() {
-  // if there's any serial available, read it:
+String header;
+String socketEvent;
+boolean buttonPressed = true;
+
+void loop() {  
   while (Serial.available() > 0) {
-    String header = Serial.readStringUntil(':');
-    String socketEvent = Serial.readStringUntil('\n');
+    header = Serial.readStringUntil(':');
+    socketEvent = Serial.readStringUntil('\n');
     Serial.println("Recieved: " + header + ":" + socketEvent);
+    // save socketEvent and then transmit back when button is pressed. then empty socketEvent
+  }
+
+  if (buttonPressed && socketEvent != "") {
     Serial.println(socketEvent);
+    // activate motor
+    socketEvent = "";
   }
 }

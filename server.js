@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
 
   // should really just be accepting one event and just doing message forwarding
   const events = ["computer--part-1", "computer--part-2", "play--v1-boarding",
-                  "play--v2-push-button", "play--v3-to-the-past", "play--v3-return", "pause--all"]
+                  "play--v2-push-button", "play--v3-to-the-past", "play--v3-return", "pause--all", "puzzles-solved"]
   events.map(event => bindRelay(event))
 })
 
