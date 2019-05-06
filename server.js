@@ -36,7 +36,8 @@ const server = http.createServer((request, response) => {
       response.end("Error!")
     }
     else {
-      response.writeHead(200, { 'Content-Type': contentType })
+      response.writeHead(200, { 'Content-Type': contentType, 
+                                "Access-Control-Allow-Origin": "*" })
       response.end(content, 'utf-8')
     }
   })

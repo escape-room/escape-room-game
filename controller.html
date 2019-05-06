@@ -74,8 +74,12 @@
       })
 
       serialSocket.on('receive-serial', (data) => {
+        console.log('<'+ data +'>')
         document.getElementById('serial-status').innerHTML = data
+        socket.emit(data.trim()) // not sure why? maybe there's a newline? but it doesn't show up in console.log???
       })
+
+      console.log(socket)
     }
   </script>
   <div class="buttons">
