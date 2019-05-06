@@ -13,6 +13,9 @@ const server = http.createServer((request, response) => {
   
   switch(filePath) {
     case './': 
+      filePath = './part1.html'
+      break
+    case './controller': 
       filePath = './controller.html'
       break
   }
