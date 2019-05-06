@@ -1,46 +1,45 @@
-// https://stackoverflow.com/questions/16333790/node-js-quick-file-server-static-files-over-http
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
 const socketio = require('socket.io')
 
+// for heroku
 const PORT = process.env.PORT || 8000 
 
 const server = http.createServer((request, response) => {
-    console.log('REQUEST TO: ' + request.url)
+  console.log('REQUEST TO: ' + request.url)
 
-    let filePath = '.' + request.url
-    
-    switch(filePath) {
-      case './': 
-        filePath = './controller.html'
-        break
+  let filePath = '.' + request.url
+  
+  switch(filePath) {
+    case './': 
+      filePath = './controller.html'
+      break
+  }
+
+  const extname = path.extname(filePath)
+  let contentType = 'text/html'
+  switch (extname) {
+      case '.js':
+          contentType = 'text/javascript'
+          break
+      case '.css':
+          contentType = 'text/css'
+          break
+      case '.jpg':
+          contentType = 'image/jpg'
+          break
+  }
+
+  fs.readFile(filePath, (error, content) => {
+    if (error) {
+      response.end("Error!")
     }
-
-    const extname = path.extname(filePath)
-    let contentType = 'text/html'
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript'
-            break
-        case '.css':
-            contentType = 'text/css'
-            break
-        case '.jpg':
-            contentType = 'image/jpg'
-            break
+    else {
+      response.writeHead(200, { 'Content-Type': contentType })
+      response.end(content, 'utf-8')
     }
-
-    fs.readFile(filePath, (error, content) => {
-      if (error) {
-        response.end("Error!")
-      }
-      else {
-        response.writeHead(200, { 'Content-Type': contentType })
-        response.end(content, 'utf-8')
-      }
   })
-
 })
 
 io = socketio(server)
